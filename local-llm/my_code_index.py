@@ -10,12 +10,16 @@ Everything stays on your machine:
   * the index is a SQLite file at ~/.agentic/my-code-index.db (override with AGENTIC_INDEX)
   * nothing is ever written inside the repos you index
 
+Folders to skip (e.g. duplicate build copies) go in a private ignore file, one glob per line:
+  $AGENTIC_INDEX_IGNORE, ~/.agentic/index-ignore.txt, or ../_private/index-ignore.txt next to the kit.
+
 Only the standard library is used. Without Ollama it falls back to a keyword-hash embedder, which
 is weaker but lets you try everything (and lets the tests run anywhere).
 """
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import hashlib
 import json
 import math
@@ -92,9 +96,19 @@ def default_embedder() -> Embedder:
     return o if o.available() else HashEmbedder()
 
 
-def iter_files(root: Path) -> Iterable[Path]:
+def load_ignore() -> list[str]:
+    kit = Path(__file__).resolve().parents[1]
+    for c in (os.environ.get("AGENTIC_INDEX_IGNORE", ""), str(Path.home() / ".agentic" / "index-ignore.txt"),
+              str(kit.parent / "_private" / "index-ignore.txt")):
+        if c and Path(c).is_file():
+            return [l.split("#", 1)[0].strip() for l in Path(c).read_text(encoding="utf-8").splitlines() if l.split("#", 1)[0].strip()]
+    return []
+
+
+def iter_files(root: Path, ignore: list[str] | None = None) -> Iterable[Path]:
+    ignore = load_ignore() if ignore is None else ignore
     for dirpath, dirnames, filenames in os.walk(root):
-        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS and not any(fnmatch.fnmatch(d, g) for g in ignore)]
         for f in filenames:
             p = Path(dirpath) / f
             if p.suffix.lower() in CODE_EXT and f not in SKIP_FILES and not SECRET_FILE.search(f):
@@ -140,10 +154,14 @@ def index_path() -> Path:
     return Path(os.environ.get("AGENTIC_INDEX", Path.home() / ".agentic" / "my-code-index.db"))
 
 
-def build(root: Path, con: sqlite3.Connection, emb: Embedder, log=print) -> int:
+def build(root: Path, con: sqlite3.Connection, emb: Embedder, log=print, ignore: list[str] | None = None) -> int:
     root = root.resolve()
-    added = 0
-    for p in iter_files(root):
+    added = files = 0
+    log(f"indexing {root} with {emb.name} ...")
+    for p in iter_files(root, ignore):
+        files += 1
+        if files % 250 == 0:
+            log(f"  {files} files scanned, {added} new chunks")
         rel = str(p.relative_to(root)).replace("\\", "/")
         data = p.read_bytes()
         if b"\x00" in data[:4000]:
@@ -158,7 +176,7 @@ def build(root: Path, con: sqlite3.Connection, emb: Embedder, log=print) -> int:
                         (c.project, c.path, c.start, c.end, c.text, emb.name, json.dumps(emb.embed(c.text)), h))
             added += 1
         con.commit()
-    log(f"indexed {added} new chunk(s) with {emb.name}")
+    log(f"done {root}: {files} files scanned, {added} new chunk(s)")
     return added
 
 

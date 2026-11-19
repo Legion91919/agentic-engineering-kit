@@ -88,6 +88,20 @@ class PersonalDataTests(unittest.TestCase):
         self.assertEqual([], scan("id 8001015009088"))  # synthetic test data, privacy-guard: ignore
 
 
+class InstallTests(unittest.TestCase):
+    def test_hook_uses_lf_line_endings(self):
+        with tempfile.TemporaryDirectory() as d:
+            repo = Path(d)
+            subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+            (repo / "tools").mkdir()
+            guard = repo / "tools" / "privacy_guard.py"
+            guard.write_text(Path(pg.__file__).read_text(encoding="utf-8"), encoding="utf-8")
+            subprocess.run([sys.executable, str(guard), "--install", "--repo", str(repo)], check=True, capture_output=True)
+            data = (repo / ".git" / "hooks" / "pre-commit").read_bytes()
+            self.assertTrue(data.startswith(b"#!/bin/sh\n"))
+            self.assertNotIn(b"\r", data)
+
+
 class StagedModeTests(unittest.TestCase):
     def test_pre_commit_blocks_a_staged_private_term(self):
         with tempfile.TemporaryDirectory() as d:

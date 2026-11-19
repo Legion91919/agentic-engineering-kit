@@ -56,7 +56,7 @@ Write-Host "dotnet $(& $Dotnet --version) | $(& $Py --version) | $(& $Git --vers
 Write-Step "Testing the kit (C# + Python)"
 Push-Location $Kit
 try {
-    Invoke-Native $Dotnet @("test", "-c", "Release", "--nologo") "dotnet test"
+    Invoke-Native $Dotnet @("test", "-c", "Release", "--nologo", "--logger", "console;verbosity=normal") "dotnet test"
     Invoke-Native $Py @("-m", "unittest", "discover", "-s", "tests/tools") "Python tests"
 } finally { Pop-Location }
 
@@ -69,7 +69,7 @@ if (($userPath -split ";") -notcontains $BinDir) {
     Write-Host "Added $BinDir to your user PATH (open a new terminal to pick it up)."
 }
 $env:Path = "$env:Path;$BinDir"
-& $AdvisorExe examples | Select-Object -First 4 | Out-Host
+Invoke-Native $AdvisorExe @("recommend", "MoneyMovement", "SmallTeam") "arch-advisor smoke test"
 
 Write-Step "Privacy hooks and hidden .agentic folders"
 foreach ($r in $Repos) {
@@ -85,7 +85,8 @@ Write-Step "Registering MCP servers with Claude Code (user scope)"
 $Claude = Get-Command claude -ErrorAction SilentlyContinue | Select-Object -First 1
 if ($Claude) {
     foreach ($s in @("arch-advisor", "my-code")) { [void](Invoke-Quiet "claude" @("mcp", "remove", $s, "-s", "user")) }
-    Invoke-Native "claude" @("mcp", "add", "-s", "user", "arch-advisor", "--", $AdvisorExe) "Registering arch-advisor"
+    # Same command as the repos' .mcp.json ("arch-advisor" on PATH), so user and project scopes don't conflict.
+    Invoke-Native "claude" @("mcp", "add", "-s", "user", "arch-advisor", "--", "arch-advisor") "Registering arch-advisor"
     if ($WithLocalLlm) {
         Invoke-Native "claude" @("mcp", "add", "-s", "user", "my-code", "--", $Py, (Join-Path $Kit "local-llm\my_code_mcp.py")) "Registering my-code"
     }

@@ -28,7 +28,7 @@ class IndexTests(unittest.TestCase):
         make_workspace(self.root)
         self.con = idx.connect(Path(self.tmp.name) / "i.db")
         self.emb = idx.HashEmbedder()
-        idx.build(self.root, self.con, self.emb, log=lambda *_: None)
+        idx.build(self.root, self.con, self.emb, log=lambda *_: None, ignore=[])
 
     def tearDown(self):
         self.con.close()
@@ -43,8 +43,15 @@ class IndexTests(unittest.TestCase):
         self.assertEqual("GameA", idx.search(self.con, self.emb, "slice sprite sheet frames", 1)[0]["project"])
         self.assertEqual("ApiB", idx.search(self.con, self.emb, "ledger idempotency key", 1)[0]["project"])
 
+    def test_ignore_globs_skip_matching_folders(self):
+        (self.root / "Copy_Build_1").mkdir()
+        (self.root / "Copy_Build_1" / "dup.py").write_text("def duplicate(): pass\n", encoding="utf-8")
+        files = {p.name for p in idx.iter_files(self.root, ignore=["Copy_Build_*"])}
+        self.assertNotIn("dup.py", files)
+        self.assertIn("slice_sheet.py", files)
+
     def test_rebuild_skips_unchanged_files(self):
-        self.assertEqual(0, idx.build(self.root, self.con, self.emb, log=lambda *_: None))
+        self.assertEqual(0, idx.build(self.root, self.con, self.emb, log=lambda *_: None, ignore=[]))
 
     def test_chunks_overlap_and_cover_the_file(self):
         text = "\n".join(f"line {i}" for i in range(1, 131))
