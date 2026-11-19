@@ -20,8 +20,8 @@ Six original consumer products for invented clients. Each one shows the same jud
 | Repo | What it is | Invented client | Launch → global | Slice 1 |
 |---|---|---|---|---|
 | `framely` | Photo-sharing social app | Lumen Collective (photographers) | Modular monolith → microservices + CDN (ref #19) | Post a photo; followers see it first (fan-out on write, EXIF location stripped) |
-| `stoep` | Community social network | Buurt Forum (neighbourhood associations) | Modular monolith → microservices (ref #20) | Group notice with live notifications and audited moderation |
-| `natter` | Private messaging | Kalahari Mobile (mobile network) | Modular monolith → microservices for live connections (ref #14) | Real-time chat with ticks, offline queue and idempotent sends |
-| `reelhouse` | Video streaming | Sahel Pictures (African cinema) | Modular monolith → microservices + event stream (ref #5) | Territory-filtered catalogue, HLS playback, resume on any device |
+| `plaza` | Community social network | Buurt Forum (neighbourhood associations) | Modular monolith → microservices (ref #20) | Group notice with live notifications and audited moderation |
+| `relay` | Private messaging | Kalahari Mobile (mobile network) | Modular monolith → microservices for live connections (ref #14) | Real-time chat with ticks, offline queue and idempotent sends |
+| `cinewave` | Video streaming | Sahel Pictures (African cinema) | Modular monolith → microservices + event stream (ref #5) | Territory-filtered catalogue, HLS playback, resume on any device |
 | `wavelength` | Music streaming | Mzansi Indie Alliance (labels) | Modular monolith → microservices (ref #5) | Search, play, queue; royalty plays counted once after 30 s |
-| `kopano-bank` | Digital banking for savings groups | Kopano Mutual (cooperative) | Modular monolith at both scales (ref #9) | Group contributions on a double-entry ledger with idempotency keys |
+| `huddle` | Digital banking for savings groups | Thrive Mutual (cooperative) | Modular monolith at both scales (ref #9) | Group contributions on a double-entry ledger with idempotency keys |
