@@ -20,7 +20,7 @@ public static class AdvisorTools
                 _ => ListTraits()))
             .Add(new ToolDefinition(
                 "list_reference_examples",
-                "List the 18 real-world reference systems (static site, booking, banking, IoT, SaaS, chat, document extraction, reporting warehouse, piece-by-piece replacement, lending back office) and the architecture that fits each.",
+                "List the 20 real-world reference systems (static site, booking, banking, IoT, SaaS, chat, document extraction, reporting warehouse, piece-by-piece replacement, lending back office) and the architecture that fits each.",
                 Schema.Empty(),
                 _ => ListExamples()))
             .Add(new ToolDefinition(

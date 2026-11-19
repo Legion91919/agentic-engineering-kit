@@ -25,7 +25,7 @@ internal static class Cli
     private const string Usage = """
         arch-advisor                       run as MCP server (stdio)
         arch-advisor traits                list traits
-        arch-advisor examples              list the 18 reference systems
+        arch-advisor examples              list the 20 reference systems
         arch-advisor recommend <Trait>...  recommend an architecture
         arch-advisor scaffold <path> <name> [purpose]   create .agentic/ context
         arch-advisor check <path> [--min <score>]       handover readiness (exit 1 if blocked or below min)

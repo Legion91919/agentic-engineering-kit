@@ -113,6 +113,8 @@ public class ArchitectureAdvisorTests
     [InlineData(16, ArchitectureStyle.LayeredMonolith)]
     [InlineData(17, ArchitectureStyle.ModularMonolith)]
     [InlineData(18, ArchitectureStyle.ModularMonolith)]
+    [InlineData(19, ArchitectureStyle.Microservices)]
+    [InlineData(20, ArchitectureStyle.Microservices)]
     public void Advisor_agrees_with_reference_examples(int exampleId, ArchitectureStyle expected)
     {
         var example = ReferenceCatalogue.Find(exampleId)!;
@@ -132,10 +134,10 @@ public class ArchitectureAdvisorTests
     }
 
     [Fact]
-    public void Catalogue_has_eighteen_uniquely_numbered_examples()
+    public void Catalogue_has_twenty_uniquely_numbered_examples()
     {
-        Assert.Equal(18, ReferenceCatalogue.All.Count);
-        Assert.Equal(18, ReferenceCatalogue.All.Select(e => e.Id).Distinct().Count());
+        Assert.Equal(20, ReferenceCatalogue.All.Count);
+        Assert.Equal(20, ReferenceCatalogue.All.Select(e => e.Id).Distinct().Count());
     }
 
     [Fact]

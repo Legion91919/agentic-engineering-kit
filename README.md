@@ -20,7 +20,7 @@ Works with Claude Code out of the box. `AGENTS.md`, the MCP servers and the skil
 
 | Part | What it does |
 |---|---|
-| **`arch-advisor` MCP server** (C#/.NET 8, no dependencies) | Turns *traits* found while mapping the domain into an architecture recommendation (style, patterns, risks, when to evolve) and explains it by analogy with **18 reference systems**, from a static site to a lending back office. Also writes ADRs, scaffolds the hidden `.agentic/` context, detects a project's stack and scores **handover readiness** for CI. |
+| **`arch-advisor` MCP server** (C#/.NET 8, no dependencies) | Turns *traits* found while mapping the domain into an architecture recommendation (style, patterns, risks, when to evolve) and explains it by analogy with **20 reference systems**, from a static site to a lending back office. Also writes ADRs, scaffolds the hidden `.agentic/` context, detects a project's stack and scores **handover readiness** for CI. |
 | **16 skills** (`.claude/skills/`) | `baton` (orchestrator) · legs: `frame`, `map-domain`, `decide-architecture`, `sketch-ui` (variant-first UI design) · slice loop: `blueprint` (planner → executor → review), `build-dotnet`, `build-web`, `build-mobile-firebase`, `data-flows`, `ai-in-product` · `prove-it`, `pass-the-baton` · support: `project-context`, `unity-game`, `privacy-guard` |
 | **11 subagents** (`.claude/agents/`) | One runner per leg (`framer`, `domain-mapper`, `architect`, `ui-sketcher`, four builders, `prover`, `handoff-writer`) plus a fresh-eyes `critic` that never reviews its own work |
 | **Hidden-context convention** | Every project keeps its knowledge in `.agentic/` (one file per question). The root stays clean, and agents load only what the task needs. |
@@ -78,6 +78,8 @@ claude  →  /baton
 | 16 | Reporting warehouse fed by many sources | One re-runnable import job per source + one warehouse + plain reporting app |
 | 17 | Replacing an old system piece by piece | Strangler fig routing layer in front of a new modular monolith |
 | 18 | Lending back office | Modular monolith + append-only cash ledger + sagas |
+| 19 | Photo-sharing social feed | Modular monolith at launch; media, graph and feed services + CDN at global scale |
+| 20 | Community social network | Modular monolith at launch; graph, groups, feed, events services at global scale |
 
 The advisor is **deterministic**: the same traits always give the same answer, and the rules are readable C#. The agent adds judgement on top (team skills, deadlines, existing cloud) and records the decision as an ADR with the alternatives it rejected.
 

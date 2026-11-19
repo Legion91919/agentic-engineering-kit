@@ -3,7 +3,7 @@ using static ArchAdvisor.Core.Trait;
 namespace ArchAdvisor.Core;
 
 /// <summary>
-/// Eighteen real-world shapes of system, each with the architecture that fits it and why.
+/// Twenty real-world shapes of system, each with the architecture that fits it and why.
 /// Used to explain a recommendation by analogy ("this is closest to a hotel booking system").
 /// </summary>
 public static class ReferenceCatalogue
@@ -102,6 +102,17 @@ public static class ReferenceCatalogue
             "Modular monolith (applications, servicing, cash, statements) with an append-only cash ledger and sagas for drawdowns.",
             "Loans run for years, drawdowns wait on sign-offs, and every cent has to reconcile for auditors.",
             T(MoneyMovement, RegulatoryAudit, LongRunningWorkflows, SeveralBusinessAreas, ComplexBusinessRules)),
+
+        // Social products.
+        new(19, "Photo-sharing social feed", ArchitectureStyle.Microservices,
+            "At global scale: media, graph, feed and notification services, a CDN for images, and feeds pre-built per follower (fan-out on write) with a pull fallback for very popular accounts.",
+            "Reads outnumber posts by orders of magnitude and images dominate bandwidth; at launch the same modules live in one modular monolith.",
+            T(MediaDelivery, ReadHeavy, PersonalData, SeveralBusinessAreas, GlobalScale)),
+
+        new(20, "Community social network (profiles, groups, events)", ArchitectureStyle.Microservices,
+            "At global scale: graph, groups, feed, events and notification services with an event stream between them; start as a modular monolith with the same module boundaries.",
+            "Many feature areas evolve at different speeds and notifications are pushed live; boundaries matter more than early splitting.",
+            T(ReadHeavy, PersonalData, SeveralBusinessAreas, LiveTracking, GlobalScale)),
     };
 
     public static ReferenceExample? Find(int id) => All.FirstOrDefault(e => e.Id == id);
