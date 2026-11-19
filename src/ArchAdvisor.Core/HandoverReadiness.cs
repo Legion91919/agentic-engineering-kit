@@ -70,7 +70,7 @@ public static partial class HandoverReadiness
         var path = $"{AgenticContext.Folder}/handover.md";
         if (!f.FileExists(path)) return new("Handover checklist", CheckResult.Fail, $"Missing {path}");
         var text = f.ReadAllText(path);
-        int open = OpenBox().Matches(text).Count, done = DoneBox().Matches(text).Count;
+        int open = OpenBox().Count(text), done = DoneBox().Count(text);
         if (open + done == 0) return new("Handover checklist", CheckResult.Warn, "No checklist items found.");
         return open == 0
             ? new("Handover checklist", CheckResult.Pass, $"{done}/{done} done")

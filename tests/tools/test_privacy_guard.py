@@ -1,3 +1,5 @@
+import contextlib
+import io
 import subprocess
 import sys
 import tempfile
@@ -95,10 +97,12 @@ class StagedModeTests(unittest.TestCase):
             subprocess.run(["git", "add", "notes.md"], cwd=repo, check=True)
             deny = repo / "deny.txt"
             deny.write_text("Project Falcon\n", encoding="utf-8")
-            self.assertEqual(1, pg.main(["--staged", "--repo", str(repo), "--denylist", str(deny)]))
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(1, pg.main(["--staged", "--repo", str(repo), "--denylist", str(deny)]))
             (repo / "notes.md").write_text("Generic lesson: anchor UI to edges\n", encoding="utf-8")
             subprocess.run(["git", "add", "notes.md"], cwd=repo, check=True)
-            self.assertEqual(0, pg.main(["--staged", "--repo", str(repo), "--denylist", str(deny)]))
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(0, pg.main(["--staged", "--repo", str(repo), "--denylist", str(deny)]))
 
 
 if __name__ == "__main__":
