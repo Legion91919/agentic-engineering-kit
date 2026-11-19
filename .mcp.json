@@ -3,10 +3,6 @@
     "arch-advisor": {
       "command": "arch-advisor",
       "args": []
-    },
-    "my-code": {
-      "command": "python",
-      "args": ["local-llm/my_code_mcp.py"]
     }
   }
 }

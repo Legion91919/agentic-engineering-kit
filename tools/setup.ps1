@@ -1,15 +1,11 @@
 <#
 .SYNOPSIS
-  One-command setup for the Agentic Engineering Kit on Windows.
+  One-command setup for the Agentic Engineering Kit on Windows. Safe to re-run.
 
 .EXAMPLE
   powershell -ExecutionPolicy Bypass -File tools\setup.ps1                 # core setup
-  powershell -ExecutionPolicy Bypass -File tools\setup.ps1 -WithLocalLlm   # also Ollama + private code index
+  powershell -ExecutionPolicy Bypass -File tools\setup.ps1 -WithLocalLlm   # also the private code index (Ollama optional)
   powershell -ExecutionPolicy Bypass -File tools\setup.ps1 -Publish        # also create the public GitHub repos and push
-
-  Steps: check tools, test, install the arch-advisor global tool, install privacy hooks,
-  hide .agentic folders, register MCP servers with Claude Code, run the privacy guard on
-  every repo, optionally build the local index and publish.
 #>
 param(
     [switch]$WithLocalLlm,
@@ -22,90 +18,125 @@ $Kit = Split-Path -Parent $PSScriptRoot
 $Workspace = Split-Path -Parent $Kit
 $Showcases = @(Get-ChildItem -Directory (Join-Path $Workspace "showcase") -ErrorAction SilentlyContinue)
 $Repos = @($Kit) + ($Showcases | ForEach-Object { $_.FullName })
+$BinDir = Join-Path $env:USERPROFILE ".agentic\bin\arch-advisor"
+$AdvisorExe = Join-Path $BinDir "arch-advisor.exe"
+$Warnings = New-Object System.Collections.Generic.List[string]
 
-function Step($text) { Write-Host "`n==> $text" -ForegroundColor Cyan }
-function Need($cmd, $hint) {
-    if (-not (Get-Command $cmd -ErrorAction SilentlyContinue)) { throw "'$cmd' not found. $hint" }
+function Write-Step([string]$Text) { Write-Host "`n==> $Text" -ForegroundColor Cyan }
+function Assert-Command([string]$Name, [string]$Hint) {
+    $c = Get-Command $Name -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+    if (-not $c) { throw "'$Name' not found. $Hint" }
+    return $c.Source
 }
-function Python {
-    if (Get-Command python -ErrorAction SilentlyContinue) { return "python" }
-    if (Get-Command py -ErrorAction SilentlyContinue) { return "py" }
-    throw "Python 3.9+ not found. winget install Python.Python.3.12"
+function Invoke-Native([string]$Exe, [string[]]$Arguments, [string]$What) {
+    & $Exe @Arguments
+    if ($LASTEXITCODE -ne 0) { throw "$What failed (exit code $LASTEXITCODE)." }
+}
+function Invoke-Quiet([string]$Exe, [string[]]$Arguments) {
+    # Windows PowerShell 5.1 turns redirected stderr into terminating errors under "Stop"; relax it here.
+    $old = $ErrorActionPreference; $ErrorActionPreference = "Continue"
+    try { & $Exe @Arguments *> $null } finally { $ErrorActionPreference = $old }
+    return $LASTEXITCODE
+}
+function Find-PythonExe {
+    foreach ($name in @("python", "py")) {
+        $c = Get-Command $name -CommandType Application -ErrorAction SilentlyContinue |
+             Where-Object { $_.Source -notlike "*\WindowsApps\*" } | Select-Object -First 1
+        if ($c) { return $c.Source }
+    }
+    throw "Python 3.9+ not found (the Microsoft Store stub doesn't count). winget install Python.Python.3.12"
 }
 
-Step "Checking tools"
-Need dotnet "winget install Microsoft.DotNet.SDK.8"
-Need git "winget install Git.Git"
-$Py = Python
-& dotnet --version | Out-Host
+Write-Step "Checking tools"
+$Dotnet = Assert-Command "dotnet" "winget install Microsoft.DotNet.SDK.8"
+$Git = Assert-Command "git" "winget install Git.Git"
+$Py = Find-PythonExe
+Write-Host "dotnet $(& $Dotnet --version) | $(& $Py --version) | $(& $Git --version)"
 
-Step "Testing the kit (C# + Python)"
+Write-Step "Testing the kit (C# + Python)"
 Push-Location $Kit
-& dotnet test -c Release
-if ($LASTEXITCODE -ne 0) { throw "dotnet test failed" }
-& $Py -m unittest discover -s tests/tools
-if ($LASTEXITCODE -ne 0) { throw "Python tests failed" }
+try {
+    Invoke-Native $Dotnet @("test", "-c", "Release", "--nologo") "dotnet test"
+    Invoke-Native $Py @("-m", "unittest", "discover", "-s", "tests/tools") "Python tests"
+} finally { Pop-Location }
 
-Step "Installing the arch-advisor global tool"
-& dotnet pack src/ArchAdvisor.Mcp -c Release -o nupkg | Out-Null
-& dotnet tool update -g arch-advisor --add-source nupkg --ignore-failed-sources
-if ($LASTEXITCODE -ne 0) { & dotnet tool install -g arch-advisor --add-source nupkg --ignore-failed-sources }
-Pop-Location
+Write-Step "Installing arch-advisor to $BinDir"
+Invoke-Native $Dotnet @("publish", (Join-Path $Kit "src\ArchAdvisor.Mcp"), "-c", "Release", "-o", $BinDir, "-p:UseAppHost=true", "--nologo") "dotnet publish"
+if (-not (Test-Path $AdvisorExe)) { throw "Publish finished but $AdvisorExe is missing." }
+$userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+if (($userPath -split ";") -notcontains $BinDir) {
+    [Environment]::SetEnvironmentVariable("Path", ($userPath.TrimEnd(";") + ";" + $BinDir), "User")
+    Write-Host "Added $BinDir to your user PATH (open a new terminal to pick it up)."
+}
+$env:Path = "$env:Path;$BinDir"
+& $AdvisorExe examples | Select-Object -First 4 | Out-Host
 
-Step "Privacy hooks and hidden .agentic folders"
+Write-Step "Privacy hooks and hidden .agentic folders"
 foreach ($r in $Repos) {
-    $guard = Join-Path $r "tools\privacy_guard.py"
-    if (Test-Path (Join-Path $r ".git")) { & $Py $guard --install --repo $r | Out-Host }
+    $name = Split-Path -Leaf $r
+    if (Test-Path (Join-Path $r ".git")) {
+        Invoke-Native $Py @((Join-Path $r "tools\privacy_guard.py"), "--install", "--repo", $r) "Hook install in $name"
+    }
     $ctx = Join-Path $r ".agentic"
-    if (Test-Path $ctx) { attrib +h $ctx }
+    if (Test-Path $ctx) { (Get-Item $ctx -Force).Attributes = "Directory,Hidden" }
 }
 
-Step "Registering MCP servers with Claude Code (user scope)"
-if (Get-Command claude -ErrorAction SilentlyContinue) {
-    & claude mcp add -s user arch-advisor -- arch-advisor 2>$null
-    if ($WithLocalLlm) { & claude mcp add -s user my-code -- $Py (Join-Path $Kit "local-llm\my_code_mcp.py") 2>$null }
+Write-Step "Registering MCP servers with Claude Code (user scope)"
+$Claude = Get-Command claude -ErrorAction SilentlyContinue | Select-Object -First 1
+if ($Claude) {
+    foreach ($s in @("arch-advisor", "my-code")) { [void](Invoke-Quiet "claude" @("mcp", "remove", $s, "-s", "user")) }
+    Invoke-Native "claude" @("mcp", "add", "-s", "user", "arch-advisor", "--", $AdvisorExe) "Registering arch-advisor"
+    if ($WithLocalLlm) {
+        Invoke-Native "claude" @("mcp", "add", "-s", "user", "my-code", "--", $Py, (Join-Path $Kit "local-llm\my_code_mcp.py")) "Registering my-code"
+    }
     & claude mcp list
 } else {
-    Write-Host "Claude Code CLI not found; skipping. The repos' .mcp.json files still register the servers per project."
+    $Warnings.Add("Claude Code CLI not found: MCP servers not registered (each repo's .mcp.json still works).")
 }
 
 if ($WithLocalLlm) {
-    Step "Local model and private code index"
-    Need ollama "winget install Ollama.Ollama"
-    & ollama pull nomic-embed-text
-    & ollama pull qwen2.5-coder:7b
-    $roots = $IndexRoots | Where-Object { Test-Path $_ }
-    & $Py (Join-Path $Kit "local-llm\my_code_index.py") build @roots
+    Write-Step "Private code index"
+    $Ollama = Get-Command ollama -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($Ollama) {
+        Invoke-Native $Ollama.Source @("pull", "nomic-embed-text") "ollama pull nomic-embed-text"
+        Invoke-Native $Ollama.Source @("pull", "qwen2.5-coder:7b") "ollama pull qwen2.5-coder:7b"
+    } else {
+        $Warnings.Add("Ollama not installed: the index uses the simpler keyword embedder for now. Install with 'winget install Ollama.Ollama' and re-run with -WithLocalLlm to upgrade it.")
+    }
+    $roots = @($IndexRoots | Where-Object { Test-Path $_ })
+    Invoke-Native $Py (@((Join-Path $Kit "local-llm\my_code_index.py"), "build") + $roots) "Building the code index"
     & $Py (Join-Path $Kit "local-llm\my_code_index.py") stats
 }
 
-Step "Privacy guard over every repo"
+Write-Step "Privacy guard over every repo"
 $blocked = @()
 foreach ($r in $Repos) {
     & $Py (Join-Path $r "tools\privacy_guard.py") --all --repo $r
-    if ($LASTEXITCODE -ne 0) { $blocked += $r }
+    if ($LASTEXITCODE -ne 0) { $blocked += (Split-Path -Leaf $r) }
 }
 if ($blocked.Count -gt 0) { throw "Privacy guard found problems in: $($blocked -join ', '). Fix them before publishing." }
 
 if ($Publish) {
-    Step "Publishing to GitHub as $GitHubUser"
-    Need gh "winget install GitHub.cli, then: gh auth login"
-    Write-Host "This creates PUBLIC repos for:" -ForegroundColor Yellow
+    Write-Step "Publishing to GitHub as $GitHubUser"
+    $Gh = Assert-Command "gh" "winget install GitHub.cli, then: gh auth login"
+    Write-Host "This creates PUBLIC repos:" -ForegroundColor Yellow
     $Repos | ForEach-Object { Write-Host "  $GitHubUser/$(Split-Path -Leaf $_)" }
-    if ((Read-Host "Type YES to continue") -ne "YES") { Write-Host "Skipped publishing."; exit 0 }
-    foreach ($r in $Repos) {
-        $name = Split-Path -Leaf $r
-        & gh repo view "$GitHubUser/$name" 2>$null | Out-Null
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "$name already exists; pushing."
-            & git -C $r push -u origin main
-        } else {
-            & gh repo create "$GitHubUser/$name" --public --source $r --remote origin --push
+    if ((Read-Host "Type YES to continue") -ne "YES") {
+        $Warnings.Add("Publishing skipped.")
+    } else {
+        foreach ($r in $Repos) {
+            $name = Split-Path -Leaf $r
+            if ((Invoke-Quiet $Gh @("repo", "view", "$GitHubUser/$name")) -eq 0) {
+                Invoke-Native $Git @("-C", $r, "push", "-u", "origin", "main") "Pushing $name"
+            } else {
+                Invoke-Native $Gh @("repo", "create", "$GitHubUser/$name", "--public", "--source", $r, "--remote", "origin", "--push") "Creating $name"
+            }
         }
+        [void](Invoke-Quiet $Gh @("variable", "set", "KIT_REPO", "--body", "$GitHubUser/agentic-engineering-kit", "--repo", "$GitHubUser/agentic-engineering-kit"))
     }
-    & gh variable set KIT_REPO --body "$GitHubUser/agentic-engineering-kit" --repo "$GitHubUser/agentic-engineering-kit" 2>$null
 }
 
 Write-Host "`nSetup complete." -ForegroundColor Green
-Write-Host "Try:  arch-advisor recommend DocumentIngestion RegulatoryAudit SmallTeam"
+foreach ($w in $Warnings) { Write-Host "  ! $w" -ForegroundColor Yellow }
+Write-Host "Try (new terminal):  arch-advisor recommend DocumentIngestion RegulatoryAudit SmallTeam"
 Write-Host "Then open a showcase in Claude Code and run /baton."

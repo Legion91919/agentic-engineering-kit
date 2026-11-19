@@ -20,7 +20,7 @@ python local-llm/my_code_index.py stats
 - With no Ollama running it falls back to a keyword-hash embedder, which is weaker but works anywhere.
 
 ### Use it from agents
-`.mcp.json` registers the `my-code` MCP server with two tools:
+`tools\setup.ps1 -WithLocalLlm` registers the `my-code` MCP server for all your projects (or run `claude mcp add -s user my-code -- python <kit>/local-llm/my_code_mcp.py`). It has two tools:
 - `search_my_code(query, k?, project?)`: returns snippets with project/path/lines
 - `ask_my_code(question, project?)`: answers with the **local** model and cites sources
 

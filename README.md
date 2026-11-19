@@ -54,7 +54,7 @@ python tools/new_project.py D:/dev/agentic/showcase/my-app "My App" "Who can't d
 claude  →  /baton
 ```
 
-`.mcp.json` registers `arch-advisor` and `my-code` automatically when you open the kit in Claude Code.
+`.mcp.json` registers `arch-advisor` for anyone who opens the kit. `tools\setup.ps1 -WithLocalLlm` registers `my-code` at user level, so you can search your own code from any project.
 
 ## Choosing an architecture: the reference systems
 
