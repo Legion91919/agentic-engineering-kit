@@ -33,6 +33,14 @@ public static class AdvisorTools
                 }, "traits"),
                 Recommend))
             .Add(new ToolDefinition(
+                "compare_architectures",
+                "Assess ten candidate designs (static site, layered, vertical slice, Clean Architecture, modular monolith, modular monolith + CQRS, event sourcing, serverless, microservices, event-driven) against the traits: rating, reasons, pros, cons and when each would be right. Use it to answer 'why not X?' in design docs and reviews.",
+                Schema.Object(new JsonObject
+                {
+                    ["traits"] = Schema.StrArray("Traits of the problem (see list_traits).", traitNames),
+                }, "traits"),
+                CompareArchitectures))
+            .Add(new ToolDefinition(
                 "write_adr",
                 "Write an Architecture Decision Record into <projectPath>/.agentic/decisions/ with the next free number. Never overwrites.",
                 Schema.Object(new JsonObject
@@ -131,7 +139,7 @@ public static class AdvisorTools
         return sb.ToString();
     }
 
-    internal static string Recommend(JsonObject args)
+    private static HashSet<Trait> ParseTraits(JsonObject args)
     {
         var raw = Schema.StringList(args, "traits");
         if (raw.Count == 0) throw new ArgumentException("Give at least one trait. Call list_traits to see them.");
@@ -142,6 +150,42 @@ public static class AdvisorTools
                 throw new ArgumentException($"Unknown trait '{r}'. Call list_traits.");
             traits.Add(t);
         }
+        return traits;
+    }
+
+    internal static string CompareArchitectures(JsonObject args)
+    {
+        var traits = ParseTraits(args);
+        var results = ArchitectureComparison.Compare(new ProjectProfile(traits));
+        var sb = new StringBuilder("# Architecture options compared\n\n");
+        sb.Append("Traits: ").AppendLine(string.Join(", ", traits.OrderBy(t => t.ToString(), StringComparer.Ordinal))).AppendLine();
+        sb.AppendLine("| Option | Fit | Complexity (1-5) | Main reason |").AppendLine("|---|---|---|---|");
+        foreach (var a in results)
+            sb.Append("| ").Append(a.Candidate.Name).Append(" | ").Append(FitLabel(a.Fit)).Append(" | ")
+              .Append(a.Candidate.Complexity).Append(" | ").Append(a.Reasons[0]).AppendLine(" |");
+        foreach (var a in results)
+        {
+            sb.AppendLine().Append("## ").Append(a.Candidate.Name).Append(" (").Append(FitLabel(a.Fit)).AppendLine(")");
+            sb.AppendLine(a.Candidate.Summary).AppendLine();
+            foreach (var r in a.Reasons) sb.Append("- ").AppendLine(r);
+            sb.Append("- Pros: ").AppendLine(string.Join("; ", a.Candidate.Pros));
+            sb.Append("- Cons: ").AppendLine(string.Join("; ", a.Candidate.Cons));
+            sb.Append("- Choose it when: ").AppendLine(a.Candidate.ChooseWhen);
+        }
+        return sb.ToString();
+    }
+
+    private static string FitLabel(Fit fit) => fit switch
+    {
+        Fit.Recommended => "Recommended",
+        Fit.GoodAlternative => "Good alternative",
+        Fit.Possible => "Possible",
+        _ => "Poor fit",
+    };
+
+    internal static string Recommend(JsonObject args)
+    {
+        var traits = ParseTraits(args);
 
         var rec = ArchitectureAdvisor.Recommend(new ProjectProfile(traits, Schema.OptString(args, "notes")));
         var sb = new StringBuilder();

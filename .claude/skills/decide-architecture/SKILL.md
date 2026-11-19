@@ -15,7 +15,7 @@ Pick the **simplest architecture that survives the known forces**, and write dow
    - The client's existing skills and cloud (an Azure/.NET shop shouldn't get a Go/AWS design).
    - Hard deadlines (a 6-week MVP is never microservices).
    - Who will run it after handover.
-4. Call `write_adr` for the style decision. **Alternatives must include at least one simpler and one more complex option, with why each lost.**
+4. Call `compare_architectures` to see every candidate's fit, then call `write_adr` for the style decision. **Alternatives must include at least one simpler and one more complex option, with why each lost.**
 5. Update `.agentic/architecture.md`: style and why, a Mermaid C4 context diagram, modules with what they own, cross-cutting concerns (auth, logging, tracing, config, errors).
 6. One ADR per hard-to-reverse decision after that (database, cloud, auth provider, messaging).
 

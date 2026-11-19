@@ -26,7 +26,7 @@ Nothing gets built until three things exist: the frame (`product.md`), a decisio
 |---|---|---|---|
 | Frame | `frame` | `framer` | the problem fits in one sentence, risks are ranked, `.agentic/` exists |
 | Map | `map-domain` | `domain-mapper` | users, data and traits have evidence; flows are numbered; slice 1 has acceptance criteria |
-| Decide | `decide-architecture` | `architect` | the advisor has run, ADR-0001 lists rejected options, and there's a context diagram |
+| Decide | `decide-architecture`, then `design-dossier` | `architect` | the advisor and `compare_architectures` have run, ADR-0001 lists rejected options, and `docs/DESIGN.md` + the README design summary exist |
 | Sketch | `sketch-ui` | `ui-sketcher` | three variants were compared, one was chosen, and all four states are drawn |
 | Slice loop | `blueprint`, then `build-dotnet` / `build-web` / `build-mobile-firebase`, `data-flows`, `ai-in-product` | `dotnet-builder`, `web-builder`, `data-builder`, `ai-builder` (or an outside executor such as Copilot following a blueprint) | each slice is demoable and its tests are green |
 | Prove | `prove-it` | `prover`, then `critic` | CI gates are on and green, and the critic reports no blockers |

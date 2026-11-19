@@ -27,6 +27,7 @@ internal static class Cli
         arch-advisor traits                list traits
         arch-advisor examples              list the 20 reference systems
         arch-advisor recommend <Trait>...  recommend an architecture
+        arch-advisor compare <Trait>...    compare ten candidate designs ("why not X?")
         arch-advisor scaffold <path> <name> [purpose]   create .agentic/ context
         arch-advisor check <path> [--min <score>]       handover readiness (exit 1 if blocked or below min)
         arch-advisor stack <path>                       stack + agent setup report (file names only)
@@ -46,6 +47,12 @@ internal static class Cli
                     return 0;
                 case "examples":
                     output.WriteLine(Call("list_reference_examples", new()));
+                    return 0;
+                case "compare" when args.Length > 1:
+                    output.WriteLine(Call("compare_architectures", new()
+                    {
+                        ["traits"] = new System.Text.Json.Nodes.JsonArray(args.Skip(1).Select(t => (System.Text.Json.Nodes.JsonNode)t).ToArray()),
+                    }));
                     return 0;
                 case "recommend" when args.Length > 1:
                     output.WriteLine(Call("recommend_architecture", new()
