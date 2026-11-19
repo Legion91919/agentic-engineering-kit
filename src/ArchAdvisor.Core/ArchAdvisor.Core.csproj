@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Pure domain logic for the architecture advisor: no I/O frameworks, no NuGet dependencies.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="ArchAdvisor.Core.Tests" />
+  </ItemGroup>
+
+</Project>

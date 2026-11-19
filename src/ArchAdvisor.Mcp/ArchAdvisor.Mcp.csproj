@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>arch-advisor</AssemblyName>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>arch-advisor</ToolCommandName>
+    <PackageId>arch-advisor</PackageId>
+    <Version>0.2.0</Version>
+    <Authors>Ettienne</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>MCP server (stdio) exposing the architecture advisor to Claude Code, Copilot, Cursor and other agents.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ArchAdvisor.Core\ArchAdvisor.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="ArchAdvisor.Core.Tests" />
+  </ItemGroup>
+
+</Project>
