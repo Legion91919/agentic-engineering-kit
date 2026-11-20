@@ -21,7 +21,9 @@ $Workspace = Split-Path -Parent $Kit
 $Showcases = @(Get-ChildItem -Directory (Join-Path $Workspace "showcase") -ErrorAction SilentlyContinue)
 $Blocks = Join-Path $Workspace "agentic-building-blocks"
 $Casino = Join-Path $Workspace "casino-platform"
-$Repos = @($Kit) + @(@($Blocks, $Casino) | Where-Object { Test-Path $_ }) + ($Showcases | ForEach-Object { $_.FullName })
+$Pages = Join-Path $Workspace "$($GitHubUser.ToLower()).github.io"
+$Profile = Join-Path $Workspace $GitHubUser
+$Repos = @($Kit) + @(@($Blocks, $Casino) | Where-Object { Test-Path $_ }) + ($Showcases | ForEach-Object { $_.FullName }) + @(@($Profile, $Pages) | Where-Object { Test-Path $_ })
 $BinDir = Join-Path $env:USERPROFILE ".agentic\bin\arch-advisor"
 $AdvisorExe = Join-Path $BinDir "arch-advisor.exe"
 $Warnings = New-Object System.Collections.Generic.List[string]
@@ -152,6 +154,11 @@ if ($Publish) {
             $remotes = @(& $Git -C $r remote)
             if ($remotes -notcontains "origin") { Invoke-Native $Git @("-C", $r, "remote", "add", "origin", $url) "Adding origin to $name" }
             Invoke-Native $Git @("-C", $r, "push", "-u", "origin", "main") "Pushing $name"
+        }
+        if (Test-Path $Pages) {
+            # Serve the portfolio site from the main branch (no-op if Pages is already on).
+            [void](Invoke-Quiet $Gh @("api", "-X", "POST", "repos/$GitHubUser/$(Split-Path -Leaf $Pages)/pages", "-f", "source[branch]=main", "-f", "source[path]=/"))
+            Write-Host "  Portfolio: https://$($GitHubUser.ToLower()).github.io (can take a minute to appear)"
         }
         [void](Invoke-Quiet $Gh @("variable", "set", "KIT_REPO", "--body", "$GitHubUser/agentic-engineering-kit", "--repo", "$GitHubUser/agentic-engineering-kit"))
     }
