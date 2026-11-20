@@ -35,3 +35,7 @@ denylist.txt
 
 # Kit-specific
 nupkg/
+
+# Python caches
+__pycache__/
+*.pyc

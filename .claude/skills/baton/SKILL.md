@@ -29,7 +29,7 @@ Nothing gets built until three things exist: the frame (`product.md`), a decisio
 | Decide | `decide-architecture`, then `design-dossier` | `architect` | the advisor and `compare_architectures` have run, ADR-0001 lists rejected options, and `docs/DESIGN.md` + the README design summary exist |
 | Sketch | `sketch-ui` | `ui-sketcher` | three variants were compared, one was chosen, and all four states are drawn |
 | Slice loop | `blueprint`, then `build-dotnet` / `build-web` / `build-mobile-firebase`, `data-flows`, `ai-in-product` | `dotnet-builder`, `web-builder`, `data-builder`, `ai-builder` (or an outside executor such as Copilot following a blueprint) | each slice is demoable and its tests are green |
-| Prove | `prove-it` | `prover`, then `critic` | CI gates are on and green, and the critic reports no blockers |
+| Prove | `prove-it`, `threat-model`, `secure-code-review`, `supply-chain-security` (+ `ai-agent-security` if models or agents are involved) | `prover`, then `critic` and `security-reviewer` | CI gates are on and green, `docs/THREAT-MODEL.md` has a test per high risk, and neither reviewer reports a blocker |
 | Pass the baton | `pass-the-baton` | `handoff-writer` | `arch-advisor check <path> --min 80` passes and an owner has deployed it once |
 
 Map, Decide and Sketch inform each other: run them close together and revisit earlier legs when a later one finds a gap. Data and AI work happens *inside* slices, never as a separate phase at the end.

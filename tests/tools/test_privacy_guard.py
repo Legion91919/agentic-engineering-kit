@@ -101,6 +101,20 @@ class InstallTests(unittest.TestCase):
             self.assertTrue(data.startswith(b"#!/bin/sh\n"))
             self.assertNotIn(b"\r", data)
 
+    def test_hook_reports_a_finding_once(self):
+        with tempfile.TemporaryDirectory() as d:
+            repo = Path(d)
+            subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+            (repo / "tools").mkdir()
+            guard = repo / "tools" / "privacy_guard.py"
+            guard.write_text(Path(pg.__file__).read_text(encoding="utf-8"), encoding="utf-8")
+            subprocess.run([sys.executable, str(guard), "--install", "--repo", str(repo)], check=True, capture_output=True)
+            (repo / "config.env").write_text("KEY=AKIAFAKEDEMO0000KEY1\n", encoding="utf-8")  # fake key, privacy-guard: ignore
+            subprocess.run(["git", "add", "config.env"], cwd=repo, check=True)
+            r = subprocess.run(["sh", ".git/hooks/pre-commit"], cwd=repo, capture_output=True, text=True)
+            self.assertEqual(1, r.returncode)
+            self.assertEqual(1, (r.stdout + r.stderr).count("AWS access key"))
+
 
 class StagedModeTests(unittest.TestCase):
     def test_pre_commit_blocks_a_staged_private_term(self):

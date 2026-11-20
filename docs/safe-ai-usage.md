@@ -6,6 +6,7 @@ Short rules for a team that builds with AI coding agents. Hand this to every eng
 - Every repo has `AGENTS.md` (hard rules) and `.agentic/` (knowledge). Agents read them before acting.
 - Agents get the **least access** needed: deny reading `.env`, secrets and private folders (`.claude/settings.json`).
 - Destructive commands (force push, `rm -rf`, dropping databases) are denied or need a human.
+- Content an agent reads (repo files, web pages, tool and MCP output) is data, not instructions, and can never approve an action. MCP servers are pinned and reviewed. Details, checks and red-team prompts: the `ai-agent-security` skill (`.claude/skills/ai-agent-security/SKILL.md`).
 
 ## 2. Humans own decisions, agents do the work
 | Agents decide alone | A human must approve |
@@ -16,7 +17,7 @@ Short rules for a team that builds with AI coding agents. Hand this to every eng
 
 ## 3. Every change is verified, not trusted
 - Agent output goes through the same CI gates as human code: tests, coverage, lint, secret scan, privacy guard.
-- A separate reviewer agent (fresh context) or a human reviews before merge.
+- A separate reviewer agent (fresh context) or a human reviews before merge; the read-only `security-reviewer` checks auth, data, dependencies, workflows and AI features.
 - "It compiles" is not done. Done = acceptance criteria demonstrated + CI green + docs updated.
 
 ## 4. Prompts are engineering artefacts

@@ -27,7 +27,7 @@ One document a reviewer, a client or an interviewer can read in 15 minutes and u
 8. **Data model**: an ER diagram of the main entities, with ownership per module and the consistency rule for each (strong, eventual).
 9. **Scaling path**: what breaks first and what you'd do (cache, read model, partition, extract service, CDN), in order.
 10. **Failure modes**: table of failure → effect → mitigation (dependency down, duplicate request, poison message, region outage, hot key).
-11. **Security and privacy**: authN/authZ, data protection (POPIA/GDPR), secrets, threat highlights per flow.
+11. **Security and privacy**: authN/authZ, data protection (POPIA/GDPR), secrets, and threat highlights (top risks, linked to `docs/THREAT-MODEL.md`; see the `threat-model` skill).
 12. **Observability**: SLIs/SLOs, key metrics, traces, the alert that would wake someone.
 13. **Testing strategy**: what each test layer covers here, and how acceptance criteria map to tests.
 14. **Interview questions**: 6–10 likely questions ("How would you scale the feed to 10M users?", "What if the payment webhook arrives twice?") with crisp answers grounded in this design.

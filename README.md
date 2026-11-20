@@ -17,6 +17,12 @@ A reusable kit for building software with AI agents that stays reliable from the
 Works with Claude Code out of the box. `AGENTS.md`, the MCP servers and the skills are plain files, so Copilot, Cursor, Codex and Gemini can use them too.
 
 
+## See it in action
+
+![Terminal demo: arch-advisor compare for two trait sets, arch-advisor recommend, and the privacy guard blocking a commit that stages a fake AWS key](docs/media/kit-demo.gif)
+
+Real commands, real output: `arch-advisor compare` rates ten designs for a small internal tool and for a regulated money platform at global scale, `arch-advisor recommend` explains its pick, and the privacy guard's pre-commit hook refuses a staged file holding an invented AWS key in a throwaway repo. Full-quality video: [docs/media/kit-demo.mp4](docs/media/kit-demo.mp4). Re-record with `python3 tools/demo/sessions/capture_kit.py && cd tools/demo && npm install && node terminal.mjs sessions/kit.json ../../docs/media kit-demo`.
+
 ## Run it in GitHub Codespaces
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Legion91919/agentic-engineering-kit?quickstart=1)
@@ -33,8 +39,9 @@ The dev container installs the SDKs, restores packages and runs every test once 
 | Part | What it does |
 |---|---|
 | **`arch-advisor` MCP server** (C#/.NET 8, no dependencies) | Turns *traits* found while mapping the domain into an architecture recommendation (style, patterns, risks, when to evolve) and explains it by analogy with **20 reference systems**, from a static site to a lending back office. Compares ten candidate designs for any project (`compare`: "why not X?"). Also writes ADRs, scaffolds the hidden `.agentic/` context, detects a project's stack and scores **handover readiness** for CI. |
-| **17 skills** (`.claude/skills/`) | `baton` (orchestrator) · legs: `frame`, `map-domain`, `decide-architecture`, `design-dossier` (DESIGN.md with every option compared, flows and Q&A), `sketch-ui` (variant-first UI design) · slice loop: `blueprint` (planner → executor → review), `build-dotnet`, `build-web`, `build-mobile-firebase`, `data-flows`, `ai-in-product` · `prove-it`, `pass-the-baton` · support: `project-context`, `unity-game`, `privacy-guard` |
-| **11 subagents** (`.claude/agents/`) | One runner per leg (`framer`, `domain-mapper`, `architect`, `ui-sketcher`, four builders, `prover`, `handoff-writer`) plus a fresh-eyes `critic` that never reviews its own work |
+| **21 skills** (`.claude/skills/`) | `baton` (orchestrator) · legs: `frame`, `map-domain`, `decide-architecture`, `design-dossier` (DESIGN.md with every option compared, flows and Q&A), `sketch-ui` (variant-first UI design) · slice loop: `blueprint` (planner → executor → review), `build-dotnet`, `build-web`, `build-mobile-firebase`, `data-flows`, `ai-in-product` · `prove-it`, `pass-the-baton` · security: `threat-model` (STRIDE per flow, risk table with proving tests), `secure-code-review` (OWASP ASVS / Top 10 checklist with greps and tests), `supply-chain-security` (locks, audits, SBOM, hardened Actions), `ai-agent-security` (prompt injection, agent permissions, OWASP LLM Top 10) · support: `project-context`, `unity-game`, `privacy-guard` |
+| **12 subagents** (`.claude/agents/`) | One runner per leg (`framer`, `domain-mapper`, `architect`, `ui-sketcher`, four builders, `prover`, `handoff-writer`) plus two fresh-eyes reviewers that never review their own work: `critic` and a read-only `security-reviewer` (findings by severity, each with file:line, proof and fix) |
+| **Security baseline** | `tools/add_security_baseline.py <repo>` adds Dependabot, a CodeQL workflow for the languages it finds and `SECURITY.md`, never overwriting existing files (templates in `templates/github/`) |
 | **Hidden-context convention** | Every project keeps its knowledge in `.agentic/` (one file per question). The root stays clean, and agents load only what the task needs. |
 | **Privacy guard** | A pre-commit hook and a Claude Code hook that block private project names (from a denylist that's never committed), secrets, emails and SA ID numbers |
 | **Local LLM** (`local-llm/`) | A private index of *your own* past projects with local embeddings (Ollama), served to agents as an MCP tool: "how did I solve this before?" |
@@ -116,9 +123,9 @@ src/ArchAdvisor.Core     pure domain logic (advisor, catalogue, ADRs, context, r
 src/ArchAdvisor.Mcp      MCP stdio server + CLI, packed as the `arch-advisor` dotnet tool
 tests/                   xUnit tests (C#) and unittest tests (Python tools)
 .claude/skills|agents    the skills library and subagents
-tools/                   privacy guard, Claude Code hook, project generator
+tools/                   privacy guard, Claude Code hook, project generator, security baseline
 local-llm/               private code index + MCP server (Ollama)
-templates/               CI, gitignore, MCP config copied into new projects
+templates/               CI, Dependabot, CodeQL, SECURITY.md, gitignore, MCP config copied into new projects
 docs/                    pipeline, safe AI usage, local LLM guide
 ```
 

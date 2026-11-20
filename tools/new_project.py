@@ -115,6 +115,9 @@ def main(argv: list[str] | None = None) -> int:
                             encoding="utf-8")
             created.append(".agentic/architecture.md (recommendation)")
 
+    # Security baseline: Dependabot, CodeQL for the detected languages, SECURITY.md (never overwrites).
+    subprocess.run([sys.executable, str(KIT / "tools" / "add_security_baseline.py"), str(root)], check=False, capture_output=True)
+
     if (root / ".git").exists():
         subprocess.run([sys.executable, str(root / "tools" / "privacy_guard.py"), "--install", "--repo", str(root)],
                        check=False, capture_output=True)

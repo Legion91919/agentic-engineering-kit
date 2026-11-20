@@ -9,16 +9,17 @@ You're done when the owner doesn't need you anymore. That includes the agents: t
 
 ## Steps
 1. Run `check_handover_readiness` (or `arch-advisor check <path> --min 80`). Clear every FAIL, then as many WARNs as you can.
-2. Finish `.agentic/handover.md`:
+2. Security before hand-off: `docs/THREAT-MODEL.md` is reviewed and dated (`threat-model`), the `security-reviewer` has no open Critical or High findings, and Dependabot, CodeQL and `SECURITY.md` are in place (`supply-chain-security`). Accepted risks go into the handover with their owner.
+3. Finish `.agentic/handover.md`:
    - Repos, infrastructure-as-code and pipelines live in the owner's accounts
    - Secrets are rotated and owned by them (list them by name only)
    - An owner engineer has had the architecture and the ADRs walked through with them
    - The runbook has been rehearsed: they deploy and roll back once while you watch
    - Known issues with severity and a suggested fix
    - The top five next steps, one line each with the reason
-3. Write up the agent setup: which skills, subagents and MCP servers exist, how to run them, and the house rules (`docs/safe-ai-usage.md`).
-4. Clear out dead code and stale branches. The README should get a stranger from clone to running app in 15 minutes.
-5. Send a short closing note: what they have, how to run it, what's next.
+4. Write up the agent setup: which skills, subagents and MCP servers exist, how to run them, and the house rules (`docs/safe-ai-usage.md`).
+5. Clear out dead code and stale branches. The README should get a stranger from clone to running app in 15 minutes.
+6. Send a short closing note: what they have, how to run it, what's next.
 
 ## Done when
-Readiness is 80% or higher with no FAIL, and someone other than you has deployed it.
+Readiness is 80% or higher with no FAIL, no Critical or High security finding is open, and someone other than you has deployed it.
