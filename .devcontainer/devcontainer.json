@@ -1,0 +1,25 @@
+{
+  "name": "agentic-engineering-kit",
+  "image": "mcr.microsoft.com/devcontainers/dotnet:1-8.0-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.12"
+    }
+  },
+  "forwardPorts": [],
+  "portsAttributes": {},
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csdevkit",
+        "ms-python.python",
+        "bierner.markdown-mermaid",
+        "editorconfig.editorconfig"
+      ]
+    }
+  },
+  "hostRequirements": {
+    "cpus": 2
+  }
+}

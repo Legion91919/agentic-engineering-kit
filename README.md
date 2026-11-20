@@ -16,6 +16,18 @@ A reusable kit for building software with AI agents that stays reliable from the
 
 Works with Claude Code out of the box. `AGENTS.md`, the MCP servers and the skills are plain files, so Copilot, Cursor, Codex and Gemini can use them too.
 
+
+## Run it in GitHub Codespaces
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Legion91919/agentic-engineering-kit?quickstart=1)
+
+The dev container installs the SDKs, restores packages and runs every test once on first start. The same setup works locally with VS Code's Dev Containers extension.
+
+| What | Command | Port |
+|---|---|---|
+| Architecture advisor | `dotnet run --project src/ArchAdvisor.Mcp -- compare MoneyMovement RegulatoryAudit SmallTeam` | - |
+| All tests (same as CI) | `scripts/test-all.sh` | - |
+
 ## What's inside
 
 | Part | What it does |
