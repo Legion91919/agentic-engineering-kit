@@ -1,17 +1,17 @@
 # Showcase projects
 
-Six small products for **Harbourline Lending** (fictional), a lender to commercial property owners. Each one is run through the Baton model, uses invented data only, and is ready to hand over.
+## Lending showcases: one domain, six deliberately different approaches
 
-| # | Repo | The problem | Traits given to the advisor | Shape it suggested | Stack |
-|---|---|---|---|---|---|
-| 1 | `termsheet-reader` | Analysts copy loan terms out of scanned term sheets and facility letters by hand | DocumentIngestion, RegulatoryAudit, ComplexBusinessRules, SmallTeam | Clean Architecture + queue-fed worker + review queue | .NET 8, React, Postgres, local or hosted model |
-| 2 | `deal-triage` | The inbound application queue is first-come-first-served, so strong deals wait | ComplexBusinessRules, DocumentIngestion, SmallTeam | Clean Architecture rules engine + model-written reasons | .NET 8, Angular |
-| 3 | `lp-hub` | Fund investors get statements by email attachment and nobody can say who opened what | MultiTenant, RegulatoryAudit, PersonalData, ReadHeavy, SeveralBusinessAreas, SmallTeam | Modular monolith with tenant isolation tests and an access log | .NET 8, Angular, Postgres |
-| 4 | `loan-ledger` | Drawdowns, interest and repayments live in spreadsheets | MoneyMovement, RegulatoryAudit, LongRunningWorkflows, SeveralBusinessAreas, ComplexBusinessRules, SmallTeam | Modular monolith, append-only ledger, idempotency keys, outbox, sagas | .NET 8, React, Postgres |
-| 5 | `rent-roll-pipeline` | Borrowers send rent rolls in a dozen layouts; the portfolio view is rebuilt by hand each month | BatchDataFeeds, ReadHeavy, ExternalPartnerIntegrations, RegulatoryAudit, SmallTeam | Import job per layout → warehouse → dashboard, with lineage and reconciliation | .NET Worker, Postgres/DuckDB |
-| 6 | `legacy-bridge` | Servicing runs on an ageing terminal app only two people understand | LegacySystems, SeveralBusinessAreas, ExternalPartnerIntegrations, SmallTeam | Strangler fig routing layer + adapter + new modular monolith | .NET 8 + YARP, contract tests |
+Six products for **Harbourline Lending** (fictional), a lender to commercial property owners. Each one solves a different problem with a different architecture, so the set shows range instead of one template repeated.
 
-Every repo gets the full agent setup and its `.agentic/` baton **before** the first feature, and the commit history shows each leg.
+| Repo | Problem | Approach demonstrated | Frontend | Building blocks |
+|---|---|---|---|---|
+| `clio` | Analysts copy loan terms out of scanned term sheets | Clean Architecture; extraction worker on a channel; pluggable model port; eval set with an accuracy gate | React | Core, Web, Auth, Audit, Outbox |
+| `metis` | Strong deals wait behind weak ones in the inbound queue | Vertical slices; explainable rules engine; weights reload live without a deploy | Angular | Core, Web, Auth |
+| `hestia` | Investors get statements by email and nobody knows who opened what | Multi-tenant modular monolith; central tenant filter with reflection tests; audited downloads | Blazor (SSR) | Core, Web, Auth, Audit, Notifications, Outbox |
+| `chronos` | Drawdowns, interest and repayments live in spreadsheets | Event sourcing + CQRS; projections; balance as of any past date; event upcasting | React | Core, Web, Idempotency, Outbox, Audit |
+| `demeter` | Rent rolls arrive in a dozen layouts and rarely reconcile | Python + DuckDB pipeline; data contracts; quarantine on mismatch; lineage to file and line | Vanilla TypeScript | (Python, on purpose) |
+| `janus` | Servicing runs on an ageing terminal app | Strangler fig; hand-rolled proxy with shadow mode; contract tests; retries and circuit breaker | React | Core, Web |
 
 ## Consumer-scale showcases
 
