@@ -111,8 +111,11 @@ class InstallTests(unittest.TestCase):
             subprocess.run([sys.executable, str(guard), "--install", "--repo", str(repo)], check=True, capture_output=True)
             (repo / "config.env").write_text("KEY=AKIAFAKEDEMO0000KEY1\n", encoding="utf-8")  # fake key, privacy-guard: ignore
             subprocess.run(["git", "add", "config.env"], cwd=repo, check=True)
-            r = subprocess.run(["sh", ".git/hooks/pre-commit"], cwd=repo, capture_output=True, text=True)
-            self.assertEqual(1, r.returncode)
+            # Let git run the hook the way it does for a real commit: git brings its own POSIX shell
+            # on Windows, where plain "sh" is usually not on PATH.
+            r = subprocess.run(["git", "-c", "user.name=test", "-c", "user.email=test@example.test", "-c", "core.hooksPath=.git/hooks",  # privacy-guard: ignore
+                                "commit", "-q", "-m", "should be blocked"], cwd=repo, capture_output=True, text=True)
+            self.assertNotEqual(0, r.returncode, "the hook must block the commit")
             self.assertEqual(1, (r.stdout + r.stderr).count("AWS access key"))
 
 
