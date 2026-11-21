@@ -3,5 +3,5 @@
   "private": true,
   "type": "module",
   "description": "Records a scripted walkthrough of a running app as MP4 + GIF + screenshots.",
-  "devDependencies": { "playwright": "1.63.0" }
+  "devDependencies": { "playwright": "1.65.1" }
 }
