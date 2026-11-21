@@ -52,6 +52,7 @@ The dev container installs the SDKs, restores packages and runs every test once 
 **Windows, one command** (tests, installs the global tool, hooks, MCP registration, privacy check):
 ```powershell
 powershell -ExecutionPolicy Bypass -File tools\setup.ps1              # add -WithLocalLlm and/or -Publish
+powershell -ExecutionPolicy Bypass -File tools\setup.ps1 -DescribeOnly # set each GitHub repo's description, homepage and topics from tools\repo-metadata.json
 ```
 
 **Step by step:**

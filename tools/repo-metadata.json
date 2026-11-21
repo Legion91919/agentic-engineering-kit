@@ -1,0 +1,215 @@
+{
+  "agentic-engineering-kit": {
+    "description": "Kit for building software with AI agents from brief to client hand-over: 22 skills, 12 subagents, an architecture-advisor MCP server (C#) that compares 10 designs against real-world systems, a privacy guard, security reviews and demo recorders. Built around the Baton model.",
+    "homepage": "https://legion91919.github.io/",
+    "topics": [
+      "ai-agents",
+      "agentic-engineering",
+      "claude-code",
+      "mcp",
+      "software-architecture",
+      "dotnet",
+      "developer-tools",
+      "prompt-engineering"
+    ]
+  },
+  "agentic-building-blocks": {
+    "description": "Nine dependency-free .NET 8 packages for what every project rebuilds: login (PBKDF2), bearer tokens, subscriptions, notifications, idempotency keys, transactional outbox and audit trail. 239 tests, a sample API and a design dossier.",
+    "homepage": "https://legion91919.github.io/",
+    "topics": [
+      "dotnet",
+      "csharp",
+      "aspnetcore",
+      "nuget",
+      "idempotency",
+      "outbox-pattern",
+      "authentication",
+      "clean-code"
+    ]
+  },
+  "casino-platform": {
+    "description": "B2B casino platform for operators and game studios on PostgreSQL: wallet, responsible gambling, game launch, bonuses, reporting. Includes Kiln, a PixiJS slot framework with two playable games, and Catwalk, where players replay every round they played.",
+    "homepage": "https://legion91919.github.io/#casino-platform",
+    "topics": [
+      "postgresql",
+      "system-design",
+      "igaming",
+      "slot-game",
+      "pixijs",
+      "typescript",
+      "event-driven",
+      "platform-engineering"
+    ]
+  },
+  "framely": {
+    "description": "Photo-first social app for a photographers' network (fictional client), Instagram-style: posts with alt text, an ad-free fan-out-on-write home feed, and location data stripped from every photo. Modular monolith, .NET 8 + React.",
+    "homepage": "https://legion91919.github.io/#framely",
+    "topics": [
+      "dotnet",
+      "react",
+      "typescript",
+      "social-network",
+      "modular-monolith",
+      "system-design"
+    ]
+  },
+  "plaza": {
+    "description": "Neighbourhood community network, Facebook-groups style: verified residents post notices and safety alerts, live SignalR notifications, moderation with an audit trail. Modular monolith, ASP.NET Core + React.",
+    "homepage": "https://legion91919.github.io/#plaza",
+    "topics": [
+      "dotnet",
+      "aspnetcore",
+      "signalr",
+      "react",
+      "social-network",
+      "modular-monolith",
+      "system-design"
+    ]
+  },
+  "relay": {
+    "description": "Private messaging for low-end phones on zero-rated data, WhatsApp-style: sent, delivered and read ticks, offline delivery, and no message bodies kept on the server after delivery. ASP.NET Core SignalR modular monolith + React.",
+    "homepage": "https://legion91919.github.io/#relay",
+    "topics": [
+      "dotnet",
+      "signalr",
+      "react",
+      "messaging",
+      "realtime",
+      "modular-monolith",
+      "system-design"
+    ]
+  },
+  "cinewave": {
+    "description": "Subscription film streaming for an African film library, Netflix-style: licensing per country, HLS video from a CDN, continue watching across devices, idempotent progress saves. Modular monolith, .NET 8 + React.",
+    "homepage": "https://legion91919.github.io/#cinewave",
+    "topics": [
+      "dotnet",
+      "react",
+      "video-streaming",
+      "hls",
+      "cdn",
+      "modular-monolith",
+      "system-design"
+    ]
+  },
+  "wavelength": {
+    "description": "Music streaming for independent labels, Spotify-style: accent-insensitive search, every play counted once via idempotent play events, and an append-only royalty ledger that reconciles to the cent. .NET 8 + React.",
+    "homepage": "https://legion91919.github.io/#wavelength",
+    "topics": [
+      "dotnet",
+      "react",
+      "music-streaming",
+      "search",
+      "ledger",
+      "modular-monolith",
+      "system-design"
+    ]
+  },
+  "huddle": {
+    "description": "Digital banking for stokvel savings groups: group balances, contributions and statements on a double-entry, append-only ledger with no editable balances. .NET 8 modular monolith + React.",
+    "homepage": "https://legion91919.github.io/#huddle",
+    "topics": [
+      "dotnet",
+      "react",
+      "fintech",
+      "banking",
+      "double-entry",
+      "ledger",
+      "modular-monolith"
+    ]
+  },
+  "clio": {
+    "description": "AI extraction of loan terms from scanned term sheets: every field with a confidence score and its source highlighted, and an analyst review queue before anything is approved. Clean Architecture, .NET 8 + React, with an evaluation suite.",
+    "homepage": "https://legion91919.github.io/#clio",
+    "topics": [
+      "dotnet",
+      "react",
+      "ai",
+      "document-extraction",
+      "human-in-the-loop",
+      "clean-architecture",
+      "fintech"
+    ]
+  },
+  "metis": {
+    "description": "Ranks inbound loan applications by explainable lending criteria and shows the top reasons behind every rank, so strong deals stop waiting behind weak ones. Vertical-slice modular monolith, .NET 8 + Angular.",
+    "homepage": "https://legion91919.github.io/#metis",
+    "topics": [
+      "dotnet",
+      "angular",
+      "vertical-slice-architecture",
+      "explainable-ai",
+      "scoring",
+      "fintech"
+    ]
+  },
+  "hestia": {
+    "description": "Investor document portal for a property lender: statements in one place instead of email attachments, tenant isolation, and an access log showing who opened which document and when. ASP.NET Core modular monolith + Blazor.",
+    "homepage": "https://legion91919.github.io/#hestia",
+    "topics": [
+      "dotnet",
+      "blazor",
+      "aspnetcore",
+      "document-portal",
+      "audit-log",
+      "multi-tenant",
+      "fintech"
+    ]
+  },
+  "chronos": {
+    "description": "Event-sourced ledger for property loans: drawdowns, interest and repayments with four-eyes approval, and any loan replayed as of a past date. CQRS inside a .NET 8 modular monolith + React.",
+    "homepage": "https://legion91919.github.io/#chronos",
+    "topics": [
+      "dotnet",
+      "react",
+      "event-sourcing",
+      "cqrs",
+      "ledger",
+      "fintech",
+      "modular-monolith"
+    ]
+  },
+  "demeter": {
+    "description": "Data pipeline for borrowers' rent rolls in many layouts: raw, clean and serve stages, each file reconciled to its stated total or quarantined, and every dashboard figure traced to its source line. Python, FastAPI, pydantic.",
+    "homepage": "https://legion91919.github.io/#demeter",
+    "topics": [
+      "python",
+      "fastapi",
+      "pydantic",
+      "data-pipeline",
+      "data-quality",
+      "medallion-architecture",
+      "etl"
+    ]
+  },
+  "janus": {
+    "description": "Strangler-fig migration off a legacy terminal app: a facade routes each capability to legacy, shadow (run both and compare) or new, and falls back when the old system is down. .NET 8 + a React traffic console.",
+    "homepage": "https://legion91919.github.io/#janus",
+    "topics": [
+      "dotnet",
+      "react",
+      "strangler-fig",
+      "legacy-modernization",
+      "reverse-proxy",
+      "migration"
+    ]
+  },
+  "Legion91919": {
+    "description": "Profile: Ettienne, senior engineer who designs systems on purpose and builds them with AI agents, with a recorded architecture decision for every project.",
+    "homepage": "https://legion91919.github.io/",
+    "topics": [
+      "profile",
+      "portfolio"
+    ]
+  },
+  "legion91919.github.io": {
+    "description": "Portfolio site: thirteen systems with live demos, the architecture each one got and why, and a decision matrix scoring 10 designs per project.",
+    "homepage": "https://legion91919.github.io/",
+    "topics": [
+      "portfolio",
+      "software-architecture",
+      "system-design",
+      "github-pages"
+    ]
+  }
+}
